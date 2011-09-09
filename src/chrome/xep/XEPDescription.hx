@@ -28,6 +28,7 @@ class XEPDescription {
 		}
 	}
 	
+	#if !PREPARE
 	public static function getXEPStatusString( i : Int )  : String {
 		return switch( i ) {
 		case XEPStatus.ACTIVE : "active";
@@ -42,6 +43,7 @@ class XEPDescription {
 		case XEPStatus.RETRACTED : "retracted";
 		}
 	}
+	#end
 	
 	#if PREPARE
 	
@@ -98,10 +100,6 @@ class XEPDescription {
 			
 			r_status.match( t );
 			var status = r_status.matched(1).toLowerCase();
-			//trace( getXEPStatus(status ) );
-			//var status = Type.createEnum( XEPStatus, r_status.matched(1).toLowerCase() );
-			//trace( status );
-			
 			
 			if( r_abstract.match( t ) ) {
 				abstract = r_abstract.matched(1);

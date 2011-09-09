@@ -1,6 +1,6 @@
 {
 	"name": "XEP-search",
-	"description": "XMPP-XEP omnibox search",
+	"description": "XMPP/XEP omnibox search",
 	"version": "1.0",
 	"icons": {
 		"16": "icons/icon_16.png",

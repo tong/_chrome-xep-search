@@ -6,7 +6,8 @@ using StringTools;
 
 class App implements IApp {
 	
-	static var DEF_URL = "http://disktree.local/chrome.xep.search/";
+	//static var DEF_URL = "http://disktree.local/chrome.xep.search/";
+	static var DEF_URL = "https://raw.github.com/tong/chrome.xep.search/master/";
 	static var XEP_BASE_URL = "http://xmpp.org/extensions/xep-";
 	static inline var MAX_SUGGESTION_LEN = 10;
 	
@@ -14,8 +15,7 @@ class App implements IApp {
 	static var xeps_description_version_available : Int;
 	static var xeps : Array<XEP>;
 	
-	public var xepStatusFilters : Array<Int>;
-	//var statusFilters : Array<XEPStatus>;
+	public var xepStatusFilters(default,null) : Array<Int>;
 	
 	function new() {
 	

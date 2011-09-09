@@ -5,8 +5,8 @@
 -lib hxmpp
 -js ext/app.js
 chrome.xep.App
--D DEBUG
-#--no-traces
+#-D DEBUG
+--no-traces
 
 --next
 -cp src
@@ -15,5 +15,5 @@ chrome.xep.App
 -js ext/options.js
 chrome.xep.Options
 -D noEmbedJS
--D DEBUG
-#--no-traces
+#-D DEBUG
+--no-traces
