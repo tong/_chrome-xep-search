@@ -6,7 +6,6 @@ using StringTools;
 
 class App implements IApp {
 	
-	//static var DEF_URL = "http://disktree.local/chrome.xep.search/";
 	static var DEF_URL = "https://raw.github.com/tong/chrome.xep.search/master/";
 	static var XEP_BASE_URL = "http://xmpp.org/extensions/xep-";
 	static inline var MAX_SUGGESTION_LEN = 10;
@@ -22,11 +21,9 @@ class App implements IApp {
 		xepStatusFilters = Storage.getObject( "xep_status_filters" );
 		if( xepStatusFilters == null ) {
 			xepStatusFilters = new Array();
-			for( i in 0...10 ) xepStatusFilters.push(i);
+			for( i in 0...Type.getClassFields(XEPStatus).length ) xepStatusFilters.push(i);
 			Storage.setObject( "xep_status_filters", xepStatusFilters );
 		}
-		trace( xepStatusFilters );
-		//for( f in xepStatusFilters ) trace(f);
 		
 		var xeps_description = LocalStorage.getItem( "xeps_description" );
 		xeps_description_version = LocalStorage.getItem( "xeps_description_version" );
@@ -90,6 +87,7 @@ class App implements IApp {
 			}
 			var term = stripped_text.toLowerCase();
 			trace( "Searching for: "+term );
+			var numberMatch = false;
 			var found = new Array<XEP>();
 			var r_number = ~/([0-9]+)/;
 			if( r_number.match( term ) ) {
@@ -97,6 +95,7 @@ class App implements IApp {
 				for( xep in xeps ) {
 					if( xep.number == number ) {
 						found.push( xep );
+						numberMatch = true;
 						break;
 					}
 				}
@@ -125,8 +124,7 @@ class App implements IApp {
 				}
 			}
 			
-			// filter by xep status
-			/*
+			// filter by XEP status
 			for( xep in found ) {
 				var filter = true;
 				for( f in xepStatusFilters ) {
@@ -138,7 +136,6 @@ class App implements IApp {
 				if( filter )
 					return;
 			}
-			*/
 			
 			if( found.length == 0 ) {
 				//TODO search something else
@@ -148,7 +145,9 @@ class App implements IApp {
 			found.sort( function(a,b){ return ( a.number > b.number ) ? 1 : -1; } );
 			var suggestions = new Array<SuggestResult>();
 			for( xep in found ) suggestions.push( createXEPSuggestResult( xep ) );
-			if( found.length < MAX_SUGGESTION_LEN && stripped_text.length >= 2 ) {
+			if( !numberMatch &&
+				found.length < MAX_SUGGESTION_LEN &&
+				stripped_text.length >= 2 ) {
 				suggestions.push({
 					 content : stripped_text+" [xmpp.org search]",
 					 description : [ "Search for \"<match>", stripped_text, "</match>\" at <match><url>xmpp.org</url></match> - <url>http://xmpp.org/search/", StringTools.urlEncode( stripped_text ), "</url>" ].join( '' )
@@ -193,9 +192,8 @@ class App implements IApp {
 		var zeros = "";
 		for( i in 0...(4-slen) ) zeros += "0";
 		var url = XEP_BASE_URL + zeros + xep.number + ".html";
-		//var description = "<match>XEP-"+zeros+xep.number+" : "+xep.title+"</match> <url>("+url+")</url>";
 		var description = "<match>XEP-"+zeros+xep.number+" : "+xep.title+"</match>";
-		if( xep.abstract != null ) {
+		if( xep.abstract != null || xep.abstract != "null" ) {
 			description += " - "+xep.abstract;
 		}
 		description += "<url>("+url+")</url>";

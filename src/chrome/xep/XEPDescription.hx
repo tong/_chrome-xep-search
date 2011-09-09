@@ -6,8 +6,6 @@ import neko.io.File;
 using StringTools;
 #end
 
-/**
-*/
 class XEPDescription {
 	
 	public static var FILE = "xeps_description";
@@ -88,14 +86,14 @@ class XEPDescription {
 			var abstract : String = null;
 			
 			if( !r_title.match( t ) ) {
-				trace( "Ignorig XEP, no title = "+f );
-				continue;
+//				trace( "Ignorig XEP, no title = "+f );
+//				continue;
 			}
 			title = r_title.matched(1);
 			
 			if( !r_name.match( t ) ) {
-				trace( "Ignorig XEP, no name = "+f+" ("+title+")" );
-				continue;
+//				trace( "Ignorig XEP, no name = "+f+" ("+title+")" );
+//				continue;
 			}
 			
 			r_status.match( t );

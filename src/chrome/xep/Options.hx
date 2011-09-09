@@ -17,20 +17,19 @@ class Options {
 		
 		var j_reload = j( '#btn_loadapi' );
 		j_reload.click(function(e) {
-			j_reload.hide();
+			j_reload.fadeOut(100);
 			haxe.Timer.delay( function(){
 				app.updateXEPsDescription( function(err){
 					if( err != null ) {
-						j( '#info' ).css("backgroundColor","#ff0000").html( 'ERROR reloading XEP description: '+err ).slideDown(200).delay(2000).slideUp(200);
+						showInfo( 'Failed to reload the XEP description ('+XEPDescription.FILE+')', true );
 					} else {
-						j( '#info' ).css("backgroundColor","#ccc").html( 'XEP description reloaded' ).slideDown(200).delay(2000).slideUp(200);
+						showInfo( 'XEP description reload complete' );
 					}
-					j_reload.show();
+					j_reload.fadeIn(200);
 				});
 			}, 1 );
 		});
 		
-		/*
 		for( f in app.xepStatusFilters )
 			j( '#statusfilter_'+XEPDescription.getXEPStatusString(f) ).attr( 'checked', 'true' );
 		for( f in Type.getClassFields( XEPStatus ) ) {
@@ -41,11 +40,13 @@ class Options {
 					app.xepStatusFilters.push( i );
 				} else {
 					app.xepStatusFilters.remove( i );
+					if( app.xepStatusFilters.length == 0 ) {
+						showInfo( "Sure?! You just deactived every XEP! No suggestions will get listed!", true, 4000 );
+					}
 				}
 				Storage.setObject( "xep_status_filters", app.xepStatusFilters );
 			});
 		}
-		*/
 		
 		/*
 		for( f in app.xepStatusFilters ) {
@@ -93,6 +94,11 @@ class Options {
 		});
 	}
 	*/
+	
+	static function showInfo( text : String, error : Bool = false, time : Int = 2000 ) {
+		var color = error ? "#ff0000" : "#ccc";
+		j( '#info' ).hide().html( text ).css( "backgroundColor", color ).slideDown(200).delay( time ).slideUp(200);
+	}
 	
 	static inline function j( id : Dynamic ) : js.JQuery { return new js.JQuery( id ); }
 	
