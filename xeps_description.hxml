@@ -1,0 +1,6 @@
+
+-lib hxmpp
+-lib format
+-cp src
+--macro chrome.xep.XEPDescription.build()
+-D PREPARE

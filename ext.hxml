@@ -1,0 +1,19 @@
+
+-cp src
+-cp ../hx.html5
+-cp ../chrome.extension
+-lib hxmpp
+-js ext/app.js
+chrome.xep.App
+-D DEBUG
+#--no-traces
+
+--next
+-cp src
+-cp ../hx.html5
+-cp ../chrome.extension
+-js ext/options.js
+chrome.xep.Options
+-D noEmbedJS
+-D DEBUG
+#--no-traces

@@ -1,0 +1,29 @@
+
+CHROME.XEP.SEARCH
+=================
+Google chrome extension for searching XMPP-XEPs using the omnibox
+
+
+ABOUT
+-----
+This extension integrates with the Chrome omnibox to bring XMPP-XEP search right to your fingertips.
+To use, type "xep", followed by a space or tab, followed by your query.
+A query can be any name/title of a XEP or a XEP number.
+Selecting a completion or fully typing a XEP name/title/number and then pressing enter will take you directly to the relevant documentation at xmpp.org.
+If a completion cannot be found, a search suggestions at xmpp.org will be provided.
+Check the options page to configure the extension to your needs.
+If you experience any issues with this extension, please use the bug tracker at https://github.com/tong/chrome.xep.search/issues
+
+If you like this extension, you might also like the other omnibox search extensions given at the following link:
+http://code.google.com/p/developer-omniboxes-for-chrome/
+
+
+LINKS
+-----
+https://github.com/tong/chrome.xep.search
+http://gitorious.org/xmpp/xmpp/trees/master/extensions
+
+
+AUTHOR
+------
+xmpp:tong@jabber.spektral.at
