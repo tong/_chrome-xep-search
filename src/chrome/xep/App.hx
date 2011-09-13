@@ -8,7 +8,7 @@ class App implements IApp {
 	
 	static var DEF_URL = "https://raw.github.com/tong/chrome.xep.search/master/";
 	static var XEP_BASE_URL = "http://xmpp.org/extensions/xep-";
-	static inline var MAX_SUGGESTION_LEN = 10;
+	static inline var MAX_SUGGESTION_LEN = 10; //TODO use 5?
 	
 	static var xeps_description_version : Int;
 	static var xeps_description_version_available : Int;
@@ -86,7 +86,7 @@ class App implements IApp {
 				return;
 			}
 			var term = stripped_text.toLowerCase();
-			trace( "Searching for: "+term );
+//			trace( "Searching for: "+term );
 			var numberMatch = false;
 			var found = new Array<XEP>();
 			var r_number = ~/([0-9]+)/;
@@ -124,25 +124,29 @@ class App implements IApp {
 				}
 			}
 			
+			//TODO use a faste algo, this sux!
 			// filter by XEP status
+			var temp = new Array<XEP>();
 			for( xep in found ) {
-				var filter = true;
 				for( f in xepStatusFilters ) {
 					if( f == xep.status ) {
-						filter = false;
+						temp.push( xep );
 						break;
 					}
 				}
-				if( filter )
-					return;
 			}
+			found = temp;
 			
 			if( found.length == 0 ) {
 				//TODO search something else
 				return;
 			}
 			
-			found.sort( function(a,b){ return ( a.number > b.number ) ? 1 : -1; } );
+			// list is already sorted
+			//found.sort( function(a,b){ return ( a.number > b.number ) ? 1 : -1; } );
+			//trace("###################################################################");
+			//for( xep in found ) trace(xep.number);
+			
 			var suggestions = new Array<SuggestResult>();
 			for( xep in found ) suggestions.push( createXEPSuggestResult( xep ) );
 			if( !numberMatch &&

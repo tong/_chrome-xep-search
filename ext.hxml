@@ -12,6 +12,7 @@ chrome.xep.App
 -cp src
 -cp ../hx.html5
 -cp ../chrome.extension
+-cp ../chrome.extension.ui
 -js ext/options.js
 chrome.xep.Options
 -D noEmbedJS
