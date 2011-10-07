@@ -1,12 +1,13 @@
 {
 	"name": "XEP-search",
 	"description": "XMPP/XEP omnibox search",
-	"version": "1.4",
+	"version": "1.5",
+	"minimum_chrome_version" : "13",
 	"icons": {
-		"16": "icons/icon_16.png",
-		"32": "icons/icon_32.png",
-		"48": "icons/icon_48.png",
-		"128": "icons/icon_128.png"
+		"16": "img/icon_16.png",
+		"32": "img/icon_32.png",
+		"48": "img/icon_48.png",
+		"128": "img/icon_128.png"
 	},
 	"background_page": "main.html",
 	"options_page": "options.html",
@@ -14,6 +15,7 @@
 	"permissions": [
 		"tabs",
 		"unlimitedStorage",
+		"notifications",
 		"https://raw.github.com/"
 	]
 }

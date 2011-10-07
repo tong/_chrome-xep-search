@@ -8,7 +8,7 @@ class App implements IApp {
 	
 	static var DEF_URL = "https://raw.github.com/tong/chrome.xep.search/master/";
 	static var XEP_BASE_URL = "http://xmpp.org/extensions/xep-";
-	static inline var MAX_SUGGESTION_LEN = 10; //TODO use 5?
+	static inline var MAX_SUGGESTIONS = 5;
 	
 	static var xeps_description_version : Int;
 	static var xeps_description_version_available : Int;
@@ -21,7 +21,8 @@ class App implements IApp {
 		xepStatusFilters = Storage.getObject( "xep_status_filters" );
 		if( xepStatusFilters == null ) {
 			xepStatusFilters = new Array();
-			for( i in 0...Type.getClassFields(XEPStatus).length ) xepStatusFilters.push(i);
+			for( i in 0...Type.getClassFields(XEPStatus).length )
+				xepStatusFilters.push(i);
 			Storage.setObject( "xep_status_filters", xepStatusFilters );
 		}
 		
@@ -48,7 +49,7 @@ class App implements IApp {
 	}
 	
 	public function updateXEPsDescription( ?cb : String->Void ) {
-		trace( "Updating XEP description ..." );
+		trace( "Loading XEP descriptions from remote host..." );
 		xeps = new Array();
 		var f = haxe.Http.requestUrl( DEF_URL + XEPDescription.FILE );
 		for( d in f.split("\n") )
@@ -58,7 +59,8 @@ class App implements IApp {
 		}
 		LocalStorage.setItem( "xeps_description",JSON.stringify( xeps )  );
 		LocalStorage.setItem( "xeps_description_version", xeps_description_version_available );
-		trace( ".. complete ("+xeps.length+")" );
+		trace( xeps.length+" XEP descriptions loaded" );
+		UI.desktopNotification( "", xeps.length+" XEP descriptions loaded", 3000 );
 		if( cb != null ) cb( null );
 	}
 	
@@ -67,128 +69,118 @@ class App implements IApp {
 	#end
 	
 	function run() {
+		setDefaultSuggestion();
+		Omnibox.onInputStarted.addListener( onInputStarted );
+		Omnibox.onInputChanged.addListener( onInputChanged );
+		Omnibox.onInputEntered.addListener( onInputEntered );
+		trace( "XEP search extension activated" );
+	}
 	
-		Omnibox.onInputStarted.addListener(
-			function(){ setDefaultSuggestion( "" ); }
-		);
+	function onInputStarted() {
+		//setDefaultSuggestion();
+	}
+	
+	function onInputChanged( text : String, suggest : Array<chrome.SuggestResult>->Void ) {
+		if( text == null )
+            return;
+		var stext = text.trim();
+		if( stext == null )
+			return;
+		if( stext == "" ) {
+			setDefaultSuggestion();
+			return;
+		}
+		var term = stext.toLowerCase();
+		var numberMatch = false;
+		var found = new Array<XEP>();
+		var r_number = ~/([0-9]+)/;
+		if( r_number.match( term ) ) {
+			var number = Std.parseInt( r_number.matched(1) );
+			for( xep in xeps ) {
+				if( xep.number == number ) {
+					found.push( xep );
+					numberMatch = true;
+					break;
+				}
+			}
+		} else {
+			var i = 0;
+			var _xeps = xeps.copy();
+			for( xep in _xeps ) {
+				if( found.length >= MAX_SUGGESTIONS )
+					break;
+				if( xep.title != null && xep.title.toLowerCase().indexOf( term ) != -1 ) {
+					found.push( xep );
+					_xeps.splice( i, 1 );
+				}
+				i++;
+			}
+			i = 0;
+			for( xep in _xeps ) {
+				if( found.length >= MAX_SUGGESTIONS )
+					break;
+				if( xep.name != null && xep.name.toLowerCase().indexOf( term ) != -1 ) {
+					found.push( xep );
+					_xeps.splice( i, 1 );
+				}
+			}
+		}
+		
+		//TODO use a faster algo, this sux!
+		// filter by XEP status
+		var temp = new Array<XEP>();
+		for( xep in found ) {
+			for( f in xepStatusFilters ) {
+				if( f == xep.status ) {
+					temp.push( xep );
+					break;
+				}
+			}
+		}
+		found = temp;
+		
+		/*
+		if( found.length == 0 ) {
+			// search somewhere else
+		}
+		*/
+		
+		// list is already sorted
+		//found.sort( function(a,b){ return ( a.number > b.number ) ? 1 : -1; } );
+		//for( xep in found ) trace(xep.number);
+		
+		var suggestions = new Array<SuggestResult>();
+		for( xep in found )
+			suggestions.push( createXEPSuggestResult( xep ) );
 
-		setDefaultSuggestion( "" );
-		
-		Omnibox.onInputChanged.addListener( function(text,suggest) {
-			setDefaultSuggestion( text );
-			if( text == null )
-	            return;
-			var stripped_text = text.trim();
-			if( stripped_text == null )
-				return;
-			if( stripped_text == "" ) {
-				setDefaultSuggestion( "" );
-				return;
-			}
-			var term = stripped_text.toLowerCase();
-//			trace( "Searching for: "+term );
-			var numberMatch = false;
-			var found = new Array<XEP>();
-			var r_number = ~/([0-9]+)/;
-			if( r_number.match( term ) ) {
-				var number = Std.parseInt( r_number.matched(1) );
-				for( xep in xeps ) {
-					if( xep.number == number ) {
-						found.push( xep );
-						numberMatch = true;
-						break;
-					}
-				}
-			} else {
-				var i = 0;
-				var _xeps = xeps.copy();
-				for( xep in _xeps ) {
-					if( found.length >= MAX_SUGGESTION_LEN )
-						break;
-					if( xep.title != null && xep.title.toLowerCase().indexOf( term ) != -1 ) {
-						//trace( "Found XEP by title "+xep.title );
-						found.push( xep );
-						_xeps.splice( i, 1 );
-					}
-					i++;
-				}
-				i = 0;
-				for( xep in _xeps ) {
-					if( found.length >= MAX_SUGGESTION_LEN )
-						break;
-					if( xep.name != null && xep.name.toLowerCase().indexOf( term ) != -1 ) {
-						//trace( "Found XEP by name "+xep.name );
-						found.push( xep );
-						_xeps.splice( i, 1 );
-					}
-				}
-			}
-			
-			//TODO use a faste algo, this sux!
-			// filter by XEP status
-			var temp = new Array<XEP>();
-			for( xep in found ) {
-				for( f in xepStatusFilters ) {
-					if( f == xep.status ) {
-						temp.push( xep );
-						break;
-					}
-				}
-			}
-			found = temp;
-			
-			if( found.length == 0 ) {
-				//TODO search something else
-				return;
-			}
-			
-			// list is already sorted
-			//found.sort( function(a,b){ return ( a.number > b.number ) ? 1 : -1; } );
-			//trace("###################################################################");
-			//for( xep in found ) trace(xep.number);
-			
-			var suggestions = new Array<SuggestResult>();
-			for( xep in found ) suggestions.push( createXEPSuggestResult( xep ) );
-			if( !numberMatch &&
-				found.length < MAX_SUGGESTION_LEN &&
-				stripped_text.length >= 2 ) {
-				suggestions.push({
-					 content : stripped_text+" [xmpp.org search]",
-					 description : [ "Search for \"<match>", stripped_text, "</match>\" at <match><url>xmpp.org</url></match> - <url>http://xmpp.org/search/", StringTools.urlEncode( stripped_text ), "</url>" ].join( '' )
-				});
-			}
-			suggest( suggestions );
-		});
-		
-		Omnibox.onInputEntered.addListener( function(text) {
-			/*
-			if( text == null ) {
-				nav( docpath );
-				return;
-			}
-			*/
-			var stripped_text = text.trim();
-			if( stripped_text == null ) {
-				nav( "http://xmpp.org/xmpp-protocols/xmpp-extensions/" );
-				return;
-			}
-			if( stripped_text.startsWith( "http://" ) || stripped_text.startsWith( "https://" ) ) {
-				nav( stripped_text );
-				return;
-			}
-			if( stripped_text.startsWith( "www." ) || stripped_text.endsWith( ".com" ) || stripped_text.endsWith( ".net" ) || stripped_text.endsWith( ".org" ) || stripped_text.endsWith( ".edu" ) ) {
-				nav( "http://"+stripped_text );
-				return;
-        	}
-        	
-        	var suffix = " [xmpp.org search]";
-        	if( stripped_text.endsWith( suffix ) ) {
-        		nav( "http://xmpp.org/search/"+formatSearchSuggestionQuery( stripped_text, suffix ) );
-				return;
-        	}
-		});
-		
-		trace( "XEP search extension active, use it!" );
+		if( !numberMatch && suggestions.length < MAX_SUGGESTIONS && stext.length >= 2 ) {
+			suggestions.push({
+				content : stext+" [xmpp.org search]",
+				description : 'Search for <url>"'+stext+'"</url> at xmpp.org'
+			});
+		}
+		suggest( suggestions );
+	}
+	
+	function onInputEntered( text : String ) {
+		var stext = text.trim();
+		if( stext == null ) {
+			nav( "http://xmpp.org/xmpp-protocols/xmpp-extensions/" );
+			return;
+		}
+		if( stext.startsWith( "http://" ) || stext.startsWith( "https://" ) ) {
+			nav( stext );
+			return;
+		}
+		if( stext.startsWith( "www." ) || stext.endsWith( ".com" ) || stext.endsWith( ".net" ) || stext.endsWith( ".org" ) || stext.endsWith( ".edu" ) ) {
+			nav( "http://"+stext );
+			return;
+    	}
+    	var suffix = " [xmpp.org search]";
+    	if( stext.endsWith( suffix ) ) {
+    		nav( "http://xmpp.org/search/"+formatSearchSuggestionQuery( stext, suffix ) );
+			return;
+    	}
 	}
 	
 	static function createXEPSuggestResult( xep : XEP ) : SuggestResult {
@@ -196,12 +188,12 @@ class App implements IApp {
 		var zeros = "";
 		for( i in 0...(4-slen) ) zeros += "0";
 		var url = XEP_BASE_URL + zeros + xep.number + ".html";
-		var description = "<match>XEP-"+zeros+xep.number+" : "+xep.title+"</match>";
+		var desc = "<match>XEP-"+zeros+xep.number+" : "+xep.title+"</match>";
 		if( xep.abstract != null || xep.abstract != "null" ) {
-			description += " - "+xep.abstract;
+			desc += "<dim> - "+xep.abstract+"</dim>";
 		}
-		description += "<url>("+url+")</url>";
-		return { content : url, description : description };
+		desc += " - <url><dim>"+url+"</dim></url>";
+		return { content : url, description : desc };
 	}
 	
 	static function formatSearchSuggestionQuery( t : String, suffix : String ) : String {
@@ -212,10 +204,10 @@ class App implements IApp {
 		chrome.Tabs.getSelected( null, function(tab) { chrome.Tabs.update( tab.id, { url: url } ); });
 	}
 	
-	static function setDefaultSuggestion( ?text : String ) {
-		var desc = '<url><match>XEP Search</match></url>';
-		if( text != null ) desc +=  " "+text;
-		Omnibox.setDefaultSuggestion( { description : desc } );
+	static function setDefaultSuggestion( text : String = "" ) {
+		var d = '<url><match>XEP Search</match></url>';
+		if( text != null ) d +=  " "+text;
+		Omnibox.setDefaultSuggestion( { description : d } );
 	}
 	
 	static function init() : IApp {
