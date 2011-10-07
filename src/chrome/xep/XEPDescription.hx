@@ -137,8 +137,8 @@ class XEPDescription {
 		fo.close();
 		
 		log( "Done" );
-		log( "File is available at chrome.xep.search/xeps" );
-		log( "Make sure to update the description version number in chrome.xep.search/"+FILE+" if required" );
+		log( "File is available at chrome.xep.search/"+FILE );
+		log( "Make sure to update the description version number in chrome.xep.search/xeps_description_version if required" );
 	}
 	
 	static function clean() {
