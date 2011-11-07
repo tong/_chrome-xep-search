@@ -105,12 +105,6 @@ class Options {
 								{ id : "source", type : "description", content : "<p>XEP-search for chrome is open source, written in <a href='http://haxe.org' title='http://haxe.org' target='_blank'>haXe</a> and licensed under <a href='http://www.gnu.org/licenses/gpl-3.0.txt' target='_blank'>GPL 3.0</a>.<br>
 You can grab the source code from <a href='https://github.com/tong/chrome.xep.search' title='https://github.com/tong/chrome.xep.search' target='_blank'>github</a>.</p>" }
 							]
-						},
-						{
-							id : "author",
-							content : [
-								{ id : "author", type : "description", content : "<p>XEP-search is created by <a href='http://disktree.net' title='http://disktree.net' target='_blank'>disktree.net</a>.</p>" }
-							]
 						}
 					]
 				}

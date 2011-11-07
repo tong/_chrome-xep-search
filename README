@@ -1,7 +1,7 @@
 
 CHROME.XEP.SEARCH
 =================
-Google chrome extension for searching XMPP-XEPs using the omnibox
+Google chrome extension for searching XMPP-XEPs using the omnibox.
 
 
 ABOUT
@@ -20,6 +20,7 @@ https://chrome.google.com/webstore/detail/agikkldfdhbpaocpoidjcfefaahobeap
 
 LINKS
 -----
+http://xmpp.org/extensions
 https://github.com/tong/chrome.xep.search
 http://gitorious.org/xmpp/xmpp/trees/master/extensions
 http://code.google.com/chrome/extensions/omnibox.html

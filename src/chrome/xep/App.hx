@@ -13,11 +13,16 @@ class App implements IApp {
 	static var xeps_description_version : Int;
 	static var xeps_description_version_available : Int;
 	static var xeps : Array<XEP>;
+	//static var searchedTerm : String;
 	
 	public var xepStatusFilters(default,null) : Array<Int>;
 	
-	function new() {
+	//var livePreview : Bool;
 	
+	function new() {
+		
+		//livePreview = true;
+		
 		xepStatusFilters = Storage.getObject( "xep_status_filters" );
 		if( xepStatusFilters == null ) {
 			xepStatusFilters = new Array();
@@ -60,7 +65,7 @@ class App implements IApp {
 		LocalStorage.setItem( "xeps_description",JSON.stringify( xeps )  );
 		LocalStorage.setItem( "xeps_description_version", xeps_description_version_available );
 		trace( xeps.length+" XEP descriptions loaded" );
-		UI.desktopNotification( "", xeps.length+" XEP descriptions loaded", 3000 );
+		UI.desktopNotification( "", "XEP descriptions updated", 3000 );
 		if( cb != null ) cb( null );
 	}
 	
@@ -72,20 +77,25 @@ class App implements IApp {
 		setDefaultSuggestion();
 		Omnibox.onInputStarted.addListener( onInputStarted );
 		Omnibox.onInputChanged.addListener( onInputChanged );
+		Omnibox.onInputCancelled.addListener( onInputCancelled );
 		Omnibox.onInputEntered.addListener( onInputEntered );
 		trace( "XEP search extension activated" );
 	}
 	
 	function onInputStarted() {
-		//setDefaultSuggestion();
+		setDefaultSuggestion();
 	}
 	
 	function onInputChanged( text : String, suggest : Array<chrome.SuggestResult>->Void ) {
-		if( text == null )
-            return;
-		var stext = text.trim();
-		if( stext == null )
+		if( text == null ) {
+			setDefaultSuggestion();
 			return;
+		}
+		var stext = text.trim();
+		if( stext == null ) {
+			setDefaultSuggestion();
+			return;
+		}
 		if( stext == "" ) {
 			setDefaultSuggestion();
 			return;
@@ -93,8 +103,10 @@ class App implements IApp {
 		var term = stext.toLowerCase();
 		var numberMatch = false;
 		var found = new Array<XEP>();
+		var numFound = 0;
 		var r_number = ~/([0-9]+)/;
 		if( r_number.match( term ) ) {
+			numFound = 1;
 			var number = Std.parseInt( r_number.matched(1) );
 			for( xep in xeps ) {
 				if( xep.number == number ) {
@@ -107,8 +119,6 @@ class App implements IApp {
 			var i = 0;
 			var _xeps = xeps.copy();
 			for( xep in _xeps ) {
-				if( found.length >= MAX_SUGGESTIONS )
-					break;
 				if( xep.title != null && xep.title.toLowerCase().indexOf( term ) != -1 ) {
 					found.push( xep );
 					_xeps.splice( i, 1 );
@@ -117,14 +127,16 @@ class App implements IApp {
 			}
 			i = 0;
 			for( xep in _xeps ) {
-				if( found.length >= MAX_SUGGESTIONS )
-					break;
 				if( xep.name != null && xep.name.toLowerCase().indexOf( term ) != -1 ) {
 					found.push( xep );
 					_xeps.splice( i, 1 );
 				}
 			}
+			numFound = found.length;
 		}
+		
+		if( found.length >= MAX_SUGGESTIONS )
+			found = found.splice( 0, MAX_SUGGESTIONS );
 		
 		//TODO use a faster algo, this sux!
 		// filter by XEP status
@@ -144,7 +156,6 @@ class App implements IApp {
 			// search somewhere else
 		}
 		*/
-		
 		// list is already sorted
 		//found.sort( function(a,b){ return ( a.number > b.number ) ? 1 : -1; } );
 		//for( xep in found ) trace(xep.number);
@@ -158,8 +169,31 @@ class App implements IApp {
 				content : stext+" [xmpp.org search]",
 				description : 'Search for <url>"'+stext+'"</url> at xmpp.org'
 			});
+		} else {
+			//else
 		}
 		suggest( suggestions );
+		//var nfo = found.join(",");
+		//var nfo = "";
+		//for( xep in found ) nfo += xep.number+",";
+		setDefaultSuggestion( numFound+" found" );
+		
+		//TODO live site preview...
+		/*
+		if( livePreview ) {
+			chrome.Tabs.getSelected( null, function(tab) {
+				//if( tab.url == "chrome://newtab/" ) {
+					//trace( suggestions );
+					var s = suggestions[0];
+					nav( suggestions[0].content );
+				//}
+			});
+		}
+		*/
+	}
+	
+	function onInputCancelled() {
+		setDefaultSuggestion();
 	}
 	
 	function onInputEntered( text : String ) {
@@ -181,6 +215,7 @@ class App implements IApp {
     		nav( "http://xmpp.org/search/"+formatSearchSuggestionQuery( stext, suffix ) );
 			return;
     	}
+    	setDefaultSuggestion();
 	}
 	
 	static function createXEPSuggestResult( xep : XEP ) : SuggestResult {
@@ -189,14 +224,16 @@ class App implements IApp {
 		for( i in 0...(4-slen) ) zeros += "0";
 		var url = XEP_BASE_URL + zeros + xep.number + ".html";
 		var desc = "<match>XEP-"+zeros+xep.number+" : "+xep.title+"</match>";
+		//var desc = "<url>XEP-"+zeros+xep.number+" : "+xep.title+"</url>";
 		if( xep.abstract != null || xep.abstract != "null" ) {
 			desc += "<dim> - "+xep.abstract+"</dim>";
 		}
 		desc += " - <url><dim>"+url+"</dim></url>";
+		//desc += " - <url>"+url+"</url>";
 		return { content : url, description : desc };
 	}
 	
-	static function formatSearchSuggestionQuery( t : String, suffix : String ) : String {
+	static inline function formatSearchSuggestionQuery( t : String, suffix : String ) : String {
 		return t.substr( 0, t.length - suffix.length ).trim().urlEncode();
 	}
 	
@@ -204,16 +241,15 @@ class App implements IApp {
 		chrome.Tabs.getSelected( null, function(tab) { chrome.Tabs.update( tab.id, { url: url } ); });
 	}
 	
-	static function setDefaultSuggestion( text : String = "" ) {
-		var d = '<url><match>XEP Search</match></url>';
-		if( text != null ) d +=  " "+text;
-		Omnibox.setDefaultSuggestion( { description : d } );
+	static function setDefaultSuggestion( text : String = " " ) {
+		if( text == "" ) text = " ";
+		Omnibox.setDefaultSuggestion( { description : text } );
 	}
 	
 	static function init() : IApp {
 		#if DEBUG
 		if( haxe.Firebug.detect() ) haxe.Firebug.redirectTraces();	
-		trace( "XEP-search" );
+		trace( "chrome.xep.search", "debug" );
 		#end
 		return new App();
 	}

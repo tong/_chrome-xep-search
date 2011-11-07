@@ -1,9 +1,9 @@
 
 -cp src
 -cp ../hx.html5
--cp ../chrome.extension
 -cp ../dui
--lib hxmpp
+-cp ../chrome.extension
+-cp ../hxmpp
 -js ext/js/app.js
 chrome.xep.App
 -D chrome
@@ -13,9 +13,9 @@ chrome.xep.App
 --next
 -cp src
 -cp ../hx.html5
+-cp ../dui
 -cp ../chrome.extension
 -cp ../chrome.extension.ui
--cp ../dui
 -js ext/js/options.js
 chrome.xep.Options
 -D chrome
