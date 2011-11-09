@@ -1,10 +1,9 @@
 {
 	"name": "XEP",
 	"description": "XMPP/XEP omnibox search",
-	"version": "1.6",
-	"minimum_chrome_version" : "13",
+	"version": "1.7",
 	"icons": {
-		"16": "img/icon_small.png",
+		"16": "img/icon_16.png",
 		"32": "img/icon_32.png",
 		"48": "img/icon_48.png",
 		"128": "img/icon_128.png"
