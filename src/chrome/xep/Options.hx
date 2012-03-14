@@ -7,7 +7,7 @@ class Options {
 	static var app : chrome.xep.IApp;
 	
 	static function init() {
-	
+		
 		app = chrome.Extension.getBackgroundPage().instance;
 		
 		#if DEBUG
@@ -26,6 +26,7 @@ class Options {
 		}
 		chrome.ui.Options.onUserInteraction = function(id:String,?params:Dynamic){
 			switch( id ) {
+/*			
 			case 'reload_xep_description' :
 				trace("reload_xep_descriptionreload_xep_descriptionreload_xep_description");
 				var j_reload = j( '#reload_xep_description' ).fadeOut(50);
@@ -40,6 +41,7 @@ class Options {
 						//TODO show desktop notification
 					});
 				}, 1);
+	*/			
 				//TODO
 						/*
 				haxe.Timer.delay( function(){

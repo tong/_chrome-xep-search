@@ -6,12 +6,12 @@ using StringTools;
 
 class App implements IApp {
 	
-	static var DEF_URL = "https://raw.github.com/tong/chrome.xep.search/master/";
+//	static var DEF_URL = "https://raw.github.com/tong/chrome.xep.search/master/";
 	static var XEP_BASE_URL = "http://xmpp.org/extensions/xep-";
 	static inline var MAX_SUGGESTIONS = 5;
 	
-	static var xeps_description_version : Int;
-	static var xeps_description_version_available : Int;
+//	static var xeps_description_version : Int;
+//	static var xeps_description_version_available : Int;
 	static var xeps : Array<XEP>;
 	//static var searchedTerm : String;
 	
@@ -24,13 +24,26 @@ class App implements IApp {
 		//livePreview = true;
 		
 		xepStatusFilters = Storage.getObject( "xep_status_filters" );
-		if( xepStatusFilters == null ) {
+		if( xepStatusFilters == null ) { // add all filters
 			xepStatusFilters = new Array();
-			for( i in 0...Type.getClassFields(XEPStatus).length )
+			for( i in 0...Type.getClassFields( XEPStatus ).length )
 				xepStatusFilters.push(i);
 			Storage.setObject( "xep_status_filters", xepStatusFilters );
 		}
 		
+		xeps = new Array();
+		var r = haxe.Resource.getString( "xep" );
+		for( d in r.split("\n") )
+			xeps.push( JSON.parse( d ) );
+		for( xep in xeps ) {
+			xep.abstract = jabber.util.Base64.decode( xep.abstract );
+		}
+		//LocalStorage.setItem( "xeps_description",JSON.stringify( xeps )  );
+		trace( xeps.length+" XEP descriptions loaded" );
+		//UI.desktopNotification( "", "XEP descriptions updated", 3000 );
+		run();
+		
+		/*
 		var xeps_description = LocalStorage.getItem( "xeps_description" );
 		xeps_description_version = LocalStorage.getItem( "xeps_description_version" );
 		xeps_description_version_available = Std.parseInt( haxe.Http.requestUrl( DEF_URL+"xeps_description_version" ) );
@@ -51,8 +64,10 @@ class App implements IApp {
 				run();
 			}
 		}
+		*/
 	}
 	
+	/*
 	public function updateXEPsDescription( ?cb : String->Void ) {
 		trace( "Loading XEP descriptions from remote host..." );
 		xeps = new Array();
@@ -68,9 +83,10 @@ class App implements IApp {
 		UI.desktopNotification( "", "XEP descriptions updated", 3000 );
 		if( cb != null ) cb( null );
 	}
+	*/
 	
 	#if DEBUG
-	public function log( v : Dynamic, ?inf : haxe.PosInfos ) haxe.Log.trace( v, inf )
+	public inline function log( v : Dynamic, ?inf : haxe.PosInfos ) haxe.Log.trace( v, inf )
 	#end
 	
 	function run() {

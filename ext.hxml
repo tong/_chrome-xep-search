@@ -1,19 +1,21 @@
 
 -cp src
 -cp ../hx.html5
--cp ../dui
+-cp ../uio
 -cp ../chrome.extension
 -cp ../hxmpp
 -js ext/js/app.js
 chrome.xep.App
 -D chrome
+-D noEmbedJS
 -D DEBUG
 #--no-traces
+-resource xeps_description@xep
 
 --next
 -cp src
 -cp ../hx.html5
--cp ../dui
+-cp ../uio
 -cp ../chrome.extension
 -cp ../chrome.extension.ui
 -js ext/js/options.js

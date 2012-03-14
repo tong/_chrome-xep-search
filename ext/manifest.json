@@ -1,5 +1,5 @@
 {
-	"name": "XEP",
+	"name": "XEP Search",
 	"description": "XMPP/XEP omnibox search",
 	"version": "1.7",
 	"icons": {
@@ -12,7 +12,8 @@
 	"options_page": "options.html",
 	"omnibox": { "keyword" : "xep" },
 	"permissions": [
-		"tabs", "unlimitedStorage","notifications",
-		"https://raw.github.com/"
+		"tabs",
+		"unlimitedStorage",
+		"notifications"
 	]
 }

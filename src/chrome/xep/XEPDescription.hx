@@ -6,9 +6,11 @@ import neko.io.File;
 using StringTools;
 #end
 
+/**
+ */
 class XEPDescription {
 	
-	public static var FILE = "xeps_description";
+	public static inline var FILE = "xep_description";
 	public static inline var MAX_ABSTRACT_LEN = 256;
 	
 	public static function getXEPStatus( s : String )  : Int {
@@ -42,6 +44,7 @@ class XEPDescription {
 		}
 	}
 	#end
+	
 	
 	#if PREPARE
 	
