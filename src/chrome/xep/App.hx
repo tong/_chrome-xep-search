@@ -254,7 +254,7 @@ class App implements IApp {
 	}
 	
 	static function nav( url : String ) {
-		chrome.Tabs.getSelected( null, function(tab) { chrome.Tabs.update( tab.id, { url: url } ); });
+		chrome.Tabs.getCurrent( function(tab) { chrome.Tabs.update( tab.id, { url: url } ); });
 	}
 	
 	static function setDefaultSuggestion( text : String = " " ) {
