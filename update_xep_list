@@ -1,0 +1,24 @@
+#!/bin/bash
+
+### Downloads XEP descriptions from public git repository and places extracted files in 'data/xeps' directory
+
+if [ -d data/xeps ]
+then
+	rm -r data/xeps
+fi
+
+mkdir data/xeps
+
+if [ ! -f data/master ]
+then
+	wget http://gitorious.org/xmpp/xmpp/archive-tarball/master
+	mv master data
+fi
+
+tar xvfz data/master
+mv xmpp-xmpp/extensions/xep-0* data/xeps
+rm -r data/xmpp-xmpp
+rm -r data/xep
+rm data/master
+
+echo Done

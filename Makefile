@@ -13,8 +13,11 @@ HXJS = haxe \
 	#-D DEBUG \
 
 all: build
-	
-$(XEP_DESCRIPTION):
+
+update-xeps:
+	./update_xep_list
+
+$(XEP_DESCRIPTION): update-xeps
 	haxe xep_description.hxml
 
 xep-description: $(XEP_DESCRIPTION)
@@ -31,6 +34,11 @@ $(OPTIONS) : $(SRC)
 ext: $(XEP_DESCRIPTION) $(APP) $(OPTIONS)
 
 build: ext
+
+
+release:
+	./release
+
 
 clean:
 	rm -f $(APP) $(OPTIONS) 
