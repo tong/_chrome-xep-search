@@ -31,6 +31,14 @@ class App implements IApp {
 			Storage.setObject( "xep_status_filters", xepStatusFilters );
 		}
 		
+		xeps = XEPS_DESC.list;
+		for( xep in xeps ) {
+			xep.abstract = jabber.util.Base64.decode( xep.abstract );
+		}
+		trace( xeps.length+" XEP descriptions loaded" );
+		run();
+		
+		/*
 		xeps = new Array();
 		var r = haxe.Resource.getString( "xep" );
 		for( d in r.split("\n") )
@@ -42,6 +50,7 @@ class App implements IApp {
 		trace( xeps.length+" XEP descriptions loaded" );
 		//UI.desktopNotification( "", "XEP descriptions updated", 3000 );
 		run();
+		*/
 		
 		/*
 		var xeps_description = LocalStorage.getItem( "xeps_description" );
@@ -254,7 +263,7 @@ class App implements IApp {
 	}
 	
 	static function nav( url : String ) {
-		chrome.Tabs.getCurrent( function(tab) { chrome.Tabs.update( tab.id, { url: url } ); });
+		chrome.Tabs.update( null, { url : url } ); // update current tab
 	}
 	
 	static function setDefaultSuggestion( text : String = " " ) {

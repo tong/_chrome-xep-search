@@ -8,9 +8,9 @@
 chrome.xep.App
 -D chrome
 -D noEmbedJS
--D DEBUG
-#--no-traces
--resource xeps_description@xep
+#-D DEBUG
+--no-traces
+#-resource xeps_description@xep
 
 --next
 -cp src
@@ -22,5 +22,5 @@ chrome.xep.App
 chrome.xep.Options
 -D chrome
 -D noEmbedJS
--D DEBUG
-#--no-traces
+#-D DEBUG
+--no-traces

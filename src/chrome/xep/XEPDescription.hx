@@ -10,7 +10,9 @@ using StringTools;
  */
 class XEPDescription {
 	
-	public static inline var FILE = "xep_description";
+	//public static inline var FILE = "xep_description";
+	public static inline var FILE = "XEPS_DESC.hx";
+	
 	public static inline var MAX_ABSTRACT_LEN = 256;
 	
 	public static function getXEPStatus( s : String )  : Int {
@@ -130,12 +132,19 @@ class XEPDescription {
 		xeps.sort( function(a,b){ return ( a.number > b.number ) ? 1 : -1; } );
 		
 		var fo = File.write( FILE );
+		fo.writeString( 'class XEPS_DESC {\n' );
+		fo.writeString( '\tpublic static inline var list = [\n' );
+		
 		for( i in 0...xeps.length ) {
 			var xep = xeps[i];
 			//fo.writeString( '{ "number":"'+xep.number+'","title":"'+xep.title+'","name":"'+xep.name+'","status":"'+Type.enumConstructor(xep.status)+'","abstract":"'+xep.abstract+'"}' );
-			fo.writeString( '{ "number":"'+xep.number+'","title":"'+xep.title+'","name":"'+xep.name+'","status":"'+xep.status+'","abstract":"'+xep.abstract+'"}' );
-			if( i != xeps.length-1 ) fo.writeString( '\n' );
+			fo.writeString( '\t\t{ number:'+xep.number+',title:"'+xep.title+'",name:"'+xep.name+'",status:'+xep.status+',abstract:"'+xep.abstract+'"}' );
+			//if( i != xeps.length-1 ) fo.writeString( '\n' );
+			if( i != xeps.length-1 ) fo.writeString( ',' );
+			fo.writeString( '\n' );
 		}
+		fo.writeString( '\t];\n' );
+		fo.writeString( '}\n' );
 		fo.flush();
 		fo.close();
 		

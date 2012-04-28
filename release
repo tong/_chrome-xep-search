@@ -1,8 +1,10 @@
 #!/bin/bash
 
 echo '*** Compressing javascript ...'
-java -jar /home/t0ng/data/bin/yuicompressor.jar ext/js/app.js -o ext/app.js
-java -jar /home/t0ng/data/bin/yuicompressor.jar ext/js/options.js -o ext/options.js
+#java -jar /home/t0ng/data/bin/yuicompressor.jar ext/js/app.js -o ext/app.js
+#java -jar /home/t0ng/data/bin/yuicompressor.jar ext/js/options.js -o ext/options.js
+yui ext/js/app.js ext/js/app.js
+yui ext/js/options.js ext/js/options.js
 echo Done.
 
 echo '*** Creating zip ...'

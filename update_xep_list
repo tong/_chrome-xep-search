@@ -17,8 +17,8 @@ fi
 
 tar xvfz data/master
 mv xmpp-xmpp/extensions/xep-0* data/xeps
-rm -r data/xmpp-xmpp
-rm -r data/xep
-rm data/master
+#rm -r data/xmpp-xmpp
+#rm -r data/xep
+#rm data/master
 
 echo Done
